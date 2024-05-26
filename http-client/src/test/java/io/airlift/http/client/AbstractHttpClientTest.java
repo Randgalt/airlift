@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import io.airlift.http.client.HttpClient.HttpResponseFuture;
 import io.airlift.http.client.StatusResponseHandler.StatusResponse;
+import io.airlift.http.client.StreamingResponseHandler.StreamingResponse;
 import io.airlift.http.client.StringResponseHandler.StringResponse;
 import io.airlift.http.client.jetty.JettyHttpClient;
 import io.airlift.log.Logging;
@@ -18,6 +19,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +46,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static com.google.common.base.Throwables.throwIfInstanceOf;
@@ -60,6 +64,7 @@ import static io.airlift.http.client.Request.Builder.prepareGet;
 import static io.airlift.http.client.Request.Builder.preparePost;
 import static io.airlift.http.client.Request.Builder.preparePut;
 import static io.airlift.http.client.StatusResponseHandler.createStatusResponseHandler;
+import static io.airlift.http.client.StreamingResponseHandler.streamingResponseHandler;
 import static io.airlift.http.client.StringResponseHandler.createStringResponseHandler;
 import static io.airlift.testing.Assertions.assertBetweenInclusive;
 import static io.airlift.testing.Assertions.assertGreaterThanOrEqual;
@@ -81,6 +86,8 @@ import static org.testng.Assert.fail;
 @Test(singleThreaded = true)
 public abstract class AbstractHttpClientTest
 {
+    public static final String LARGE_CONTENT = IntStream.range(0, 10_000_000).mapToObj(ignore -> "hello").collect(Collectors.joining());
+
     protected EchoServlet servlet;
     protected TestingHttpServer server;
     protected URI baseURI;
@@ -582,6 +589,24 @@ public abstract class AbstractHttpClientTest
 
         int statusCode = executeRequest(request, createStatusResponseHandler()).getStatusCode();
         assertEquals(statusCode, 543);
+    }
+
+    @Test
+    public void testStreamingResponseHandler()
+            throws Exception
+    {
+        servlet.setResponseBody(LARGE_CONTENT);
+
+        Request request = prepareGet()
+                .setUri(baseURI)
+                .build();
+
+        try (StreamingResponse streamingResponse = executeRequest(request, streamingResponseHandler())) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            streamingResponse.write(outputStream);
+            String responseString = outputStream.toString(UTF_8);
+            assertEquals(responseString, LARGE_CONTENT);
+        }
     }
 
     @Test
