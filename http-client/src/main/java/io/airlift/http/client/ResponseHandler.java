@@ -22,4 +22,9 @@ public interface ResponseHandler<T, E extends Exception>
 
     T handle(Request request, Response response)
             throws E;
+
+    default void completeRequest(Runnable completer)
+    {
+        completer.run();
+    }
 }
