@@ -770,7 +770,7 @@ public class JettyHttpClient
         requireNonNull(request, "request is null");
         requireNonNull(responseHandler, "responseHandler is null");
 
-        checkArgument(!responseHandler.getClass().isAssignableFrom(StreamingResponseHandler.class), "StreamingResponseHandler cannot be used with executeAsync()");
+        boolean isStreamingResponse = responseHandler.getClass().isAssignableFrom(StreamingResponseHandler.class);
 
         try {
             request = applyRequestFilters(request);
@@ -793,14 +793,27 @@ public class JettyHttpClient
 
         JettyResponseFuture<T, E> future = new JettyResponseFuture<>(request, jettyRequest, requestSize::getBytes, responseHandler, span, stats, recordRequestComplete);
 
-        BufferingResponseListener listener = new BufferingResponseListener(future, Ints.saturatedCast(maxContentLength))
-        {
-            @Override
-            public void onBegin(Response response)
+        Response.Listener listener;
+        if (isStreamingResponse) {
+            listener = new StreamingAsyncResponseListener(future)
             {
-                callHttpStatusListeners(response);
-            }
-        };
+                @Override
+                public void onBegin(Response response)
+                {
+                    callHttpStatusListeners(response);
+                }
+            };
+        }
+        else {
+            listener = new BufferingResponseListener(future, Ints.saturatedCast(maxContentLength))
+            {
+                @Override
+                public void onBegin(Response response)
+                {
+                    callHttpStatusListeners(response);
+                }
+            };
+        }
 
         long requestTimestamp = System.currentTimeMillis();
 
