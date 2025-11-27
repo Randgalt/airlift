@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 
 import static io.airlift.mcp.McpException.exception;
-import static io.airlift.mcp.model.JsonRpcRequest.JSON_RPC_VERSION;
+import static io.airlift.mcp.model.Constants.JSON_RPC_VERSION;
 import static io.airlift.mcp.model.JsonRpcRequest.buildNotification;
 import static io.airlift.mcp.reference.ReferenceServerTransport.requireSessionId;
 import static io.airlift.mcp.sessions.SessionKey.LOGGING_LEVEL;
