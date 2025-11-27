@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import static io.airlift.mcp.McpException.exception;
-import static io.airlift.mcp.model.JsonRpcRequest.JSON_RPC_VERSION;
+import static io.airlift.mcp.model.Constants.JSON_RPC_VERSION;
 import static io.airlift.mcp.tasks.CombinedIds.combineIds;
 import static io.airlift.mcp.tasks.CombinedIds.splitIds;
 import static io.modelcontextprotocol.spec.HttpHeaders.MCP_SESSION_ID;
