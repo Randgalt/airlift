@@ -6,7 +6,7 @@ import io.airlift.log.Logger;
 import io.airlift.mcp.McpException;
 import io.airlift.mcp.McpIdentityMapper;
 import io.airlift.mcp.McpMetadata;
-import io.airlift.mcp.model.JsonRpcErrorCode;
+import io.airlift.mcp.model.Constants;
 import io.airlift.mcp.model.JsonRpcErrorDetail;
 import io.airlift.mcp.model.McpIdentity;
 import io.airlift.mcp.model.McpIdentity.Authenticated;
@@ -34,9 +34,6 @@ import static java.util.Objects.requireNonNull;
 public class ReferenceFilter
         extends HttpFilter
 {
-    public static final String HTTP_RESPONSE_ATTRIBUTE = ReferenceFilter.class.getName() + ".response";
-
-    private static final String MCP_IDENTITY_ATTRIBUTE = ReferenceFilter.class.getName() + ".identity";
     private static final Set<String> ALLOWED_HTTP_METHODS = ImmutableSet.of("GET", "POST");
     private static final Logger log = Logger.get(ReferenceFilter.class);
 
@@ -66,8 +63,8 @@ public class ReferenceFilter
             try {
                 switch (identity) {
                     case Authenticated<?> authenticated -> {
-                        request.setAttribute(MCP_IDENTITY_ATTRIBUTE, authenticated.identity());
-                        request.setAttribute(HTTP_RESPONSE_ATTRIBUTE, response);
+                        request.setAttribute(Constants.MCP_IDENTITY_ATTRIBUTE, authenticated.identity());
+                        request.setAttribute(Constants.HTTP_RESPONSE_ATTRIBUTE, response);
 
                         transport.service(request, response);
                     }
@@ -93,15 +90,6 @@ public class ReferenceFilter
                 throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(errorDetail.code(), errorDetail.message(), errorDetail.data()));
             }
         }
-    }
-
-    public static Object retrieveIdentityValue(HttpServletRequest request)
-    {
-        Object identity = request.getAttribute(MCP_IDENTITY_ATTRIBUTE);
-        if (identity == null) {
-            throw McpException.exception(JsonRpcErrorCode.INTERNAL_ERROR, "Error in request processing. MCP identity not found.");
-        }
-        return identity;
     }
 
     private boolean isMcpRequest(HttpServletRequest request)

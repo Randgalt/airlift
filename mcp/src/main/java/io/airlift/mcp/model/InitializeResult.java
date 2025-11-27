@@ -8,7 +8,7 @@ public record InitializeResult(
         String protocolVersion,
         ServerCapabilities capabilities,
         Implementation serverInfo,
-        String instructions)
+        Optional<String> instructions)
 {
     public record ServerCapabilities(Optional<CompletionCapabilities> completions, Optional<LoggingCapabilities> logging, Optional<ListChanged> prompts, Optional<SubscribeListChanged> resources, Optional<ListChanged> tools)
     {

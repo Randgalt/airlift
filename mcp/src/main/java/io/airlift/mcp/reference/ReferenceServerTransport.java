@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.airlift.mcp.McpException.exception;
-import static io.airlift.mcp.reference.ReferenceFilter.HTTP_RESPONSE_ATTRIBUTE;
+import static io.airlift.mcp.model.Constants.HTTP_RESPONSE_ATTRIBUTE;
 import static io.airlift.mcp.sessions.SessionKey.LOGGING_LEVEL;
 import static io.modelcontextprotocol.common.McpTransportContext.KEY;
 import static io.modelcontextprotocol.spec.HttpHeaders.MCP_SESSION_ID;

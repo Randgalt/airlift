@@ -14,6 +14,7 @@ import io.airlift.mcp.handler.PromptEntry;
 import io.airlift.mcp.handler.ResourceEntry;
 import io.airlift.mcp.handler.ResourceTemplateEntry;
 import io.airlift.mcp.handler.ToolEntry;
+import io.airlift.mcp.internal.InternalMcpModule;
 import io.airlift.mcp.model.Content;
 import io.airlift.mcp.model.Content.AudioContent;
 import io.airlift.mcp.model.Content.EmbeddedResource;
@@ -22,7 +23,6 @@ import io.airlift.mcp.model.Content.ResourceLink;
 import io.airlift.mcp.model.Content.TextContent;
 import io.airlift.mcp.model.Role;
 import io.airlift.mcp.reference.McpErrorSerializer;
-import io.airlift.mcp.reference.ReferenceModule;
 import io.airlift.mcp.reflection.IdentityMapperMetadata;
 import io.airlift.mcp.reflection.PromptHandlerProvider;
 import io.airlift.mcp.reflection.ResourceHandlerProvider;
@@ -226,7 +226,8 @@ public class McpModule
         bindSessions(binder);
 
         if (mode == Mode.REFERENCE_SDK) {
-            binder.install(new ReferenceModule());
+            //binder.install(new ReferenceModule());
+            binder.install(new InternalMcpModule());
         }
     }
 

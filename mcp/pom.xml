@@ -24,6 +24,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>bootstrap</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>configuration</artifactId>
         </dependency>
 
@@ -109,6 +114,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <scope>provided</scope>
@@ -116,14 +126,14 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>node</artifactId>
+            <artifactId>log-manager</artifactId>
             <scope>runtime</scope>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>bootstrap</artifactId>
-            <scope>test</scope>
+            <artifactId>node</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -141,12 +151,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jaxrs</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>log-manager</artifactId>
             <scope>test</scope>
         </dependency>
 
