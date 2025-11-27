@@ -1,4 +1,4 @@
-package io.airlift.mcp.reference;
+package io.airlift.mcp.internal;
 
 import io.airlift.configuration.Config;
 import io.airlift.units.Duration;

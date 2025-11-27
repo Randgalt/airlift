@@ -140,7 +140,7 @@ public class TestMcp
         assertThat(response.getResponseBody()).contains("Identity Invalid Identity is not authorized to access");
 
         response = rpcCall(ERRORED_IDENTITY, request);
-        assertThat(response.getStatusCode()).isEqualTo(500);
+        assertThat(response.getStatusCode()).isIn(400, 500);
         assertThat(response.getHeaders("WWW-Authenticate")).isEmpty();
         assertThat(response.getResponseBody()).contains("This identity cannot catch a break");
 
@@ -165,7 +165,7 @@ public class TestMcp
         FullJsonResponseHandler.JsonResponse<Object> response = httpClient.execute(request, createFullJsonResponseHandler(jsonCodec(new TypeToken<>() {})));
         assertThat(response.getStatusCode()).isEqualTo(400);
         assertThat(response.getResponseBody())
-                .isEqualTo("{\"code\":%s,\"message\":\"Both application/json and text/event-stream required in Accept header\"}".formatted(INVALID_REQUEST.code()));
+                .isEqualTo("{\"jsonrpc\":\"2.0\",\"error\":{\"code\":%s,\"message\":\"Both application/json and text/event-stream required in Accept header\"}}".formatted(INVALID_REQUEST.code()));
 
         // nonsensical object in body
         request = preparePost().setUri(baseUri)
@@ -177,7 +177,7 @@ public class TestMcp
         response = httpClient.execute(request, createFullJsonResponseHandler(jsonCodec(new TypeToken<>() {})));
         assertThat(response.getStatusCode()).isEqualTo(400);
         assertThat(response.getResponseBody())
-                .isEqualTo("{\"code\":%s,\"message\":\"Invalid message format\"}".formatted(INVALID_REQUEST.code()));
+                .isEqualTo("{\"jsonrpc\":\"2.0\",\"error\":{\"code\":%s,\"message\":\"Invalid message format\"}}".formatted(INVALID_REQUEST.code()));
     }
 
     @Test

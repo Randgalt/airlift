@@ -1,4 +1,4 @@
-package io.airlift.mcp.reference;
+package io.airlift.mcp.internal;
 
 import com.google.common.base.Stopwatch;
 import com.google.inject.Inject;
@@ -8,12 +8,12 @@ import io.airlift.mcp.handler.ToolHandler;
 import io.airlift.mcp.model.CallToolRequest;
 import io.airlift.mcp.model.CallToolResult;
 import io.airlift.mcp.model.JsonRpcErrorDetail;
+import io.airlift.mcp.model.JsonRpcResponse;
 import io.airlift.mcp.tasks.CombinedIds;
 import io.airlift.mcp.tasks.EndTaskReason;
 import io.airlift.mcp.tasks.TaskController;
 import io.airlift.mcp.tasks.TaskId;
 import io.airlift.mcp.tasks.TaskResult;
-import io.modelcontextprotocol.spec.McpSchema.JSONRPCResponse;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class TaskEmulationDecorator
         return maybeTaskController.map(controller -> internalDecorate(controller, delegate)).orElse(delegate);
     }
 
-    public void handleMcpResponse(JSONRPCResponse rpcResponse, Runnable rejectionHandler)
+    public void handleMcpResponse(JsonRpcResponse<?> rpcResponse, Runnable rejectionHandler)
     {
         maybeTaskController.ifPresentOrElse(taskController -> checkForTaskResponse(taskController, rpcResponse), rejectionHandler);
     }
@@ -65,7 +65,7 @@ public class TaskEmulationDecorator
         };
     }
 
-    private void checkForTaskResponse(TaskController taskController, JSONRPCResponse rpcResponse)
+    private void checkForTaskResponse(TaskController taskController, JsonRpcResponse<?> rpcResponse)
     {
         try {
             CombinedIds<TaskId, UUID> combinedIds = splitIds(String.valueOf(rpcResponse.id()), TaskId::new, UUID::fromString);
@@ -74,7 +74,7 @@ public class TaskEmulationDecorator
 
             log.debug("checkForTaskResult received for task %s, request %s", taskId, requestId);
 
-            Optional<JsonRpcErrorDetail> error = Optional.ofNullable(rpcResponse.error()).map(rpcError -> new JsonRpcErrorDetail(rpcError.code(), Optional.ofNullable(rpcError.message())
+            Optional<JsonRpcErrorDetail> error = rpcResponse.error().map(rpcError -> new JsonRpcErrorDetail(rpcError.code(), Optional.ofNullable(rpcError.message())
                     .orElse(""), Optional.ofNullable(rpcError.data())));
             if (!taskController.setServerClientResponse(taskId, requestId, Optional.ofNullable(rpcResponse.result()), error)) {
                 log.warn("Unable to set response for task %s, request %s: invalid task ID", taskId, requestId);
